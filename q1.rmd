@@ -1,0 +1,110 @@
+---
+title: "Project 1 DS6371"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+#Libaries
+library(dplyr)
+library(ggplot2)
+library(car)
+```
+
+
+
+
+```{r}
+#read in data 
+train <- read.csv("train.csv")
+test <- read.csv("test.csv")
+```
+
+
+```{r}
+#Select data
+
+neighborhoodDatTrain <- dplyr::filter(train,Neighborhood =="Edwards" | Neighborhood =="NAmes" | Neighborhood == "BrkSide")
+neighborhoodDatTrain <- neighborhoodDatTrain[,c(13,47,81)]
+
+
+neighborhoodDatTest <- dplyr::filter(test,Neighborhood =="Edwards" | Neighborhood =="NAmes" | Neighborhood == "BrkSide")
+neighborhoodDatTest <- neighborhoodDatTest[,c(13,47)]
+
+neighborhoodDatTrain$Neighborhood <- as.factor(neighborhoodDatTrain$Neighborhood)
+
+
+
+
+```
+
+
+
+
+
+```{r}
+
+#Some summary statistics on training data set
+summary(train)
+
+#Some summary statistics on training data set
+summary(test)
+
+
+#Some EDA on the training 
+
+
+# Basic histogram of prices
+p<-ggplot(neighborhoodDatTrain, aes(x=SalePrice)) + geom_histogram(color="black", fill="white")
+p
+
+# Basic histogram of sq footage
+q<-ggplot(neighborhoodDatTrain, aes(x=GrLivArea)) + geom_histogram(color="black", fill="white")
+q
+
+# Bar plot of neighborhoods
+ggplot(neighborhoodDatTrain) + geom_bar(aes(x = Neighborhood))
+
+
+
+################################################################################
+#Log transform
+
+# Basic histogram of prices
+p<-ggplot(neighborhoodDatTrain, aes(x=log(SalePrice))) + geom_histogram(color="black", fill="white")
+p
+
+# Basic histogram of sq footage
+q<-ggplot(neighborhoodDatTrain, aes(x=log(GrLivArea))) + geom_histogram(color="black", fill="white")
+q
+
+#Scatter plots
+r <-ggplot(neighborhoodDatTrain, aes(x = log(GrLivArea), y = log(SalePrice))) +
+    geom_point()
+r
+
+################################################################################
+#Create lm
+priceLm <- lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=neighborhoodDatTrain)
+summary(priceLm)
+
+#Look at ANOVA
+res.aov <- aov(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea, data = neighborhoodDatTrain)
+summary(res.aov)
+
+
+
+#Model diagnostics, leverage plots
+leveragePlots(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=neighborhoodDatTrain))
+
+#Model diagnostics, Cook's Distance
+plot(cooks.distance(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=neighborhoodDatTrain)))
+
+plot(priceLm)
+
+
+```
+
