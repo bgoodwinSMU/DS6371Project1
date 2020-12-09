@@ -20,7 +20,7 @@ Century 21 Ames in Ames Iowa has commissioned us to answer a few questions about
 
 Century 21 Ames has a statistical background and would like to make sure that model assumptions are addressed and that any suspicious observations are identified and addressed.  We'll wrap up by providing a written conclusion that quantifies the relationship between living area an dsale price with respect to the neighborhoods century 21 sells houses in.  
 
-##################################################################################################################################
+#########################################################################################################
 
 Analysis 2, build the most predictive model for sales prices of homes in all of Ames Iowa, including all neighborhoods.  Four models are required, forward selection, backwards eliminations, one from stepwise selection, and a custom model.  
 
