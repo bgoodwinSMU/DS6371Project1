@@ -12,6 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
 library(ggplot2)
 library(car)
+library(caret)
 ```
 
 
@@ -131,9 +132,26 @@ priceLm <- lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,
 summary(priceLm)
 confint(priceLm)
 
-#predict
-pred.w.plim <- predict(priceLm, neighborhoodDatTest, interval = "prediction")
+#Internal CV
+trainIndex <- createDataPartition(neighborhoodDatTrain$SalePrice, p = .8, list = FALSE, times = 1)
+head(trainIndex)
+
+saleTrain <- neighborhoodDatTrain[ trainIndex,]
+saleTest  <- neighborhoodDatTrain[-trainIndex,]
+
+pred.w.plim <- predict(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=saleTrain), saleTest, interval = "prediction")
+pred.w.clim <- predict(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=saleTrain), saleTest, interval = "confidence")
 View(exp(pred.w.plim))
+
+matplot(saleTest$SalePrice, cbind(pred.w.clim, pred.w.plim[,-1]),
+        lty = c(1,2,2,3,3), type = "l", ylab = "predicted y")
+
+
+
+#predict test data set
+pred.w.plim <- predict(priceLm, neighborhoodDatTest, interval = "prediction")
+View(exp(pred.w.clim))
+View(neighborhoodDatTrain$SalePrice)
 
 
 #Look at ANOVA
