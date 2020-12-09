@@ -131,6 +131,11 @@ priceLm <- lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,
 summary(priceLm)
 confint(priceLm)
 
+#predict
+pred.w.plim <- predict(priceLm, neighborhoodDatTest, interval = "prediction")
+View(exp(pred.w.plim))
+
+
 #Look at ANOVA
 res.aov <- aov(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea, data = noOutlierDat)
 summary(res.aov)
