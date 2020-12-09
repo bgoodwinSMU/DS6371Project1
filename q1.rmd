@@ -68,7 +68,10 @@ q
 # Bar plot of neighborhoods
 ggplot(neighborhoodDatTrain) + geom_bar(aes(x = Neighborhood))
 
-
+#Scatter plots
+r <-ggplot(neighborhoodDatTrain, aes(x = (GrLivArea), y = (SalePrice),color=Neighborhood)) +
+    geom_point()
+r
 
 ################################################################################
 #Log transform
@@ -82,19 +85,21 @@ q<-ggplot(neighborhoodDatTrain, aes(x=log(GrLivArea))) + geom_histogram(color="b
 q
 
 #Scatter plots
-r <-ggplot(neighborhoodDatTrain, aes(x = log(GrLivArea), y = log(SalePrice))) +
+r <-ggplot(neighborhoodDatTrain, aes(x = log(GrLivArea), y = log(SalePrice),color=Neighborhood)) +
     geom_point()
 r
 
 ################################################################################
-#Create lm
+#Create lm with outliers
 priceLm <- lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=neighborhoodDatTrain)
 summary(priceLm)
+confint(priceLm)
 
 #Look at ANOVA
 res.aov <- aov(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea, data = neighborhoodDatTrain)
 summary(res.aov)
 
+plot(priceLm)
 
 
 #Model diagnostics, leverage plots
@@ -103,7 +108,58 @@ leveragePlots(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivAr
 #Model diagnostics, Cook's Distance
 plot(cooks.distance(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=neighborhoodDatTrain)))
 
+
+sort(cooks.distance(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=neighborhoodDatTrain)),decreasing = TRUE)
+
+
+
+#Model diagnostics, Quantile-Quantile plot
+qqPlot(log(neighborhoodDatTrain$SalePrice))
+
+
+#Hist of residuals
+h <- hist(priceLm$residuals, breaks = 10, density = 10,col = "lightgray",main = "Residuals") 
+xfit <- seq(min(priceLm$residuals), max(priceLm$residuals), length = 40) 
+yfit <- dnorm(xfit, mean = mean(priceLm$residuals), sd = sd(priceLm$residuals)) 
+yfit <- yfit * diff(h$mids[1:2]) * length(priceLm$residuals) 
+
+
+################################################################################
+#Create lm without outliers
+noOutlierDat <- neighborhoodDatTrain[-c(169,190,339),]
+priceLm <- lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=noOutlierDat)
+summary(priceLm)
+confint(priceLm)
+
+#Look at ANOVA
+res.aov <- aov(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea, data = noOutlierDat)
+summary(res.aov)
+
 plot(priceLm)
+
+
+#Model diagnostics, leverage plots
+leveragePlots(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=noOutlierDat))
+
+#Model diagnostics, Cook's Distance
+plot(cooks.distance(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=noOutlierDat)))
+
+
+sort(cooks.distance(lm(log(SalePrice)~log(GrLivArea)+Neighborhood+Neighborhood*GrLivArea,data=noOutlierDat)),decreasing = TRUE)
+
+
+
+#Model diagnostics, Quantile-Quantile plot
+qqPlot(log(noOutlierDat$SalePrice))
+
+
+#Hist of residuals
+h <- hist(priceLm$residuals, breaks = 10, density = 10,col = "lightgray",main = "Residuals") 
+xfit <- seq(min(priceLm$residuals), max(priceLm$residuals), length = 40) 
+yfit <- dnorm(xfit, mean = mean(priceLm$residuals), sd = sd(priceLm$residuals)) 
+yfit <- yfit * diff(h$mids[1:2]) * length(priceLm$residuals) 
+
+
 
 
 ```
