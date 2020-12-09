@@ -10,7 +10,7 @@ Variables of interest: Neighborhood (NAmes,Edwards,BrkSide), SalesPrice, GrLIvAr
 
 Outcome of interest: SalePrice
 
-Predictors: Neighborhood, GrLivArea, SalePrice * Neighborhood
+Predictors: Neighborhood, GrLivArea, GrLivArea * Neighborhood
 
 Deliverables: Restatement of the problem, build and fit model, assumption check (residuals plots, influential point analysis (cook's D and Leverage)), comparing competing models (Adj R^2 and internal CV press), Parameters (estimates, interpretation, confidence intervals) ,conclusions, and a codebook (well commented). 
 
